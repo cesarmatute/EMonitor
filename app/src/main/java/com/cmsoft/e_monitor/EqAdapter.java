@@ -32,18 +32,30 @@ public class EqAdapter extends ArrayAdapter<Earthquake> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ViewHolder holder;
 
-        View rootView = inflater.inflate(layoutId, null);
+        if(convertView==null){
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        TextView magnitudeTextView = (TextView) rootView.findViewById(R.id.eq_list_item_magnitude);
-        TextView placeTextView = (TextView) rootView.findViewById(R.id.eq_list_item_place);
+            convertView = inflater.inflate(layoutId, null);
+            holder = new ViewHolder();
+            holder.magnitudeTextView = (TextView) convertView.findViewById(R.id.eq_list_item_magnitude);
+            holder.placeTextView = (TextView) convertView.findViewById(R.id.eq_list_item_place);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
 
         Earthquake earthquake = eqList.get(position);
 
-        magnitudeTextView.setText(earthquake.getMagnitude());
-        placeTextView.setText(earthquake.getPlace());
+        holder.magnitudeTextView.setText(earthquake.getMagnitude());
+        holder.placeTextView.setText(earthquake.getPlace());
 
-        return rootView;
+        return convertView;
+    }
+
+    public class ViewHolder{
+        public TextView magnitudeTextView;
+        public TextView placeTextView;
     }
 }
