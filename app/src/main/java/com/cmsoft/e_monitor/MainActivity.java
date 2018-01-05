@@ -2,8 +2,13 @@ package com.cmsoft.e_monitor;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,24 +22,20 @@ import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncTAsk.DownloadEqsInterface {
+    private ListView earthquakeListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView earthquakeListView = (ListView) findViewById(R.id.earthquake_listview);
-        ArrayList<Earthquake> eqList = new ArrayList<>();
+        earthquakeListView = (ListView) findViewById(R.id.earthquake_listview);
 
-        eqList.add(new Earthquake("4.6","97 Km S of Wonosari, Indonesia"));
-        eqList.add(new Earthquake("2.3","16 Km S of Joshua Tree, CA"));
-        eqList.add(new Earthquake("3.4","97 Km S of Wonosari, Indonesia"));
 
-        EqAdapter eqAdapter = new EqAdapter(this, R.layout.eq_list_item, eqList);
-        earthquakeListView.setAdapter(eqAdapter);
 
         DownloadEqsAsyncTAsk downloadEqsAsyncTAsk = new DownloadEqsAsyncTAsk();
+        downloadEqsAsyncTAsk.delegate = this;
         try {
             downloadEqsAsyncTAsk.execute(new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"));
         } catch (MalformedURLException e) {
@@ -44,6 +45,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onEqsDownloaded(String eqsData) {
+        ArrayList<Earthquake> eqList = new ArrayList<>();
 
+        try {
+            JSONObject jsonObject = new JSONObject(eqsData);
+            JSONArray featuresJsonArray = jsonObject.getJSONArray("features");
+
+            for (int i=0; i<featuresJsonArray.length();i++) {
+                JSONObject featutresJsonObject = featuresJsonArray.getJSONObject(i);
+                JSONObject propertiesJsonObject = featutresJsonObject.getJSONObject("properties");
+                double magnitude = propertiesJsonObject.getDouble("mag");
+                String place = propertiesJsonObject.getString("place");
+                eqList.add(new Earthquake(magnitude,place));
+                Log.d("JSON", "Magnitude: " + magnitude + " Place: " + place);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        EqAdapter eqAdapter = new EqAdapter(this, R.layout.eq_list_item, eqList);
+        earthquakeListView.setAdapter(eqAdapter);
+    }
 }
 

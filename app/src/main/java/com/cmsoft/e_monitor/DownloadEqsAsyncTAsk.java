@@ -19,6 +19,12 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class DownloadEqsAsyncTAsk  extends AsyncTask<URL, Void, String>{
 
+    public DownloadEqsInterface delegate;
+
+    public interface DownloadEqsInterface {
+        void onEqsDownloaded(String eqsData);
+    }
+
     @Override
     protected String doInBackground(URL... urls) {
         String eqData = "";
@@ -33,9 +39,9 @@ public class DownloadEqsAsyncTAsk  extends AsyncTask<URL, Void, String>{
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        Log.d("MANZANA", s);
+    protected void onPostExecute(String eqData) {
+        super.onPostExecute(eqData);
+        delegate.onEqsDownloaded(eqData);
     }
 
     private String downloadData(URL url) throws IOException {
