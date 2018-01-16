@@ -1,8 +1,11 @@
 package com.cmsoft.e_monitor;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncTAsk.DownloadEqsInterface {
+    public static final String SELECTED_EARTHQUAKE = "selected_earthquake";
     private ListView earthquakeListView;
 
     @Override
@@ -32,8 +36,6 @@ public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncT
 
         earthquakeListView = (ListView) findViewById(R.id.earthquake_listview);
 
-
-
         DownloadEqsAsyncTAsk downloadEqsAsyncTAsk = new DownloadEqsAsyncTAsk();
         downloadEqsAsyncTAsk.delegate = this;
         try {
@@ -41,34 +43,22 @@ public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncT
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override
-    public void onEqsDownloaded(String eqsData) {
-        ArrayList<Earthquake> eqList = new ArrayList<>();
-
-        try {
-            JSONObject jsonObject = new JSONObject(eqsData);
-            JSONArray featuresJsonArray = jsonObject.getJSONArray("features");
-
-            for (int i=0; i<featuresJsonArray.length();i++) {
-                JSONObject featutresJsonObject = featuresJsonArray.getJSONObject(i);
-                JSONObject propertiesJsonObject = featutresJsonObject.getJSONObject("properties");
-                double magnitude = propertiesJsonObject.getDouble("mag");
-                String place = propertiesJsonObject.getString("place");
-                eqList.add(new Earthquake(magnitude,place));
-                Log.d("JSON", "Magnitude: " + magnitude + " Place: " + place);
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        EqAdapter eqAdapter = new EqAdapter(this, R.layout.eq_list_item, eqList);
+    public void onEqsDownloaded(ArrayList<Earthquake>eqList) {
+        final EqAdapter eqAdapter = new EqAdapter(this, R.layout.eq_list_item, eqList);
         earthquakeListView.setAdapter(eqAdapter);
+
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Earthquake selectedEarthquake = eqAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra(SELECTED_EARTHQUAKE, selectedEarthquake);
+                startActivity(intent);
+            }
+        });
     }
 }
 
