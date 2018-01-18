@@ -15,8 +15,6 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        TextView eqDetailTextView = (TextView) findViewById(R.id.eq_detail_text_view);
-
         Bundle extras = getIntent().getExtras();
         Earthquake earthquake = extras.getParcelable(MainActivity.SELECTED_EARTHQUAKE);
 
