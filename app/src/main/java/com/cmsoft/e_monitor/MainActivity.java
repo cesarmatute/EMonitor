@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncTAsk.DownloadEqsInterface {
+public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncTask.DownloadEqsInterface {
     public static final String SELECTED_EARTHQUAKE = "selected_earthquake";
     private ListView earthquakeListView;
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncT
     }
 
     private void downloadEarthquakes() {
-        DownloadEqsAsyncTAsk downloadEqsAsyncTAsk = new DownloadEqsAsyncTAsk(this);
+        DownloadEqsAsyncTask downloadEqsAsyncTAsk = new DownloadEqsAsyncTask(this);
         downloadEqsAsyncTAsk.delegate = this;
         try {
             downloadEqsAsyncTAsk.execute(new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"));
