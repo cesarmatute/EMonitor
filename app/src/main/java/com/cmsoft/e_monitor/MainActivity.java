@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEqsAsyncT
 
         earthquakeListView = (ListView) findViewById(R.id.earthquake_listview);
 
-        DownloadEqsAsyncTAsk downloadEqsAsyncTAsk = new DownloadEqsAsyncTAsk();
+        DownloadEqsAsyncTAsk downloadEqsAsyncTAsk = new DownloadEqsAsyncTAsk(this);
         downloadEqsAsyncTAsk.delegate = this;
         try {
             downloadEqsAsyncTAsk.execute(new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"));
